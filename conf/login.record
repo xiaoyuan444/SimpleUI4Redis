@@ -1,0 +1,13 @@
+last_ip=127.0.0.1
+port2=6379
+ip2=127.0.0.1
+port1=6379
+ip1=127.0.0.1
+last_port=6379
+pwd2=
+pwd1=
+record_count=2
+last_name=本地redis
+last_pwd=
+name2=服务redis
+name1=本地redis
