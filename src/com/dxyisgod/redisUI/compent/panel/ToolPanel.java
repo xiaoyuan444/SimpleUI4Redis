@@ -124,7 +124,7 @@ public class ToolPanel extends JPanel{
 		if("".equals(text) || null==text) {
 			text = Application.mainUI.editPanel.editArea.getText();
 		}
-		List<Object> result = RedisUtil.getInstance().commit(text);
+		List<Object> result = RedisUtil.commit(text);
 		result.forEach(r->Application.mainUI.dataPanel.resultPanel.showWithoutClear(r));
 	}
 	

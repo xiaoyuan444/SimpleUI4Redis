@@ -24,6 +24,10 @@ public class RedisUtil extends Jedis{
 		super(ip, port, connectionTimeout, soTimeout);
 	}
 
+	public static RedisUtil getInstance() {
+		return redis;
+	}
+	
 	/*
 	 * 初始化
 	 */
@@ -41,22 +45,9 @@ public class RedisUtil extends Jedis{
 	}
 	
 	/*
-	 * 单例模式
-	 */
-	public static RedisUtil getInstance() {
-		if(redis!=null) {
-			return redis;
-		}else {
-			//如果没有init成功就执行操作的话会抛出NOAUTH异常
-			redis = new RedisUtil();
-			return redis;
-		}
-	}
-	
-	/*
 	 * 通过反射Jedis的方法来执行命令
 	 */
-	private Object sendCommand(String command) throws Throwable{
+	private static Object sendCommand(String command) throws Throwable{
 		//空行直接返回空
 		if (null == command || "".equals(command.trim())) {
 			return "";
@@ -95,7 +86,7 @@ public class RedisUtil extends Jedis{
 			}
 		}
 		try {
-			return m.invoke(this, args);
+			return m.invoke(redis, args);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,9 +105,9 @@ public class RedisUtil extends Jedis{
 	/*
 	 * 默认发送指令方法，出异常返回null
 	 */
-	public Object sendCommandDefaultNull(final String command) {
+	public static Object sendCommandDefaultNull(final String command) {
 		try {
-			return this.sendCommand(command);
+			return sendCommand(command);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return null;
@@ -126,16 +117,16 @@ public class RedisUtil extends Jedis{
 	/*
 	 * 发送指令方法，出异常不做处理
 	 */
-	public Object sendCommandThrowable(final String command) throws Throwable {
-		return this.sendCommand(command);
+	public static Object sendCommandThrowable(final String command) throws Throwable {
+		return sendCommand(command);
 	}
 
 	/*
 	 * 发送指令方法，出异常则返回异常信息
 	 */
-	public Object sendCommandUseErrmsg(final String command) {
+	public static Object sendCommandUseErrmsg(final String command) {
 		try {
-			return this.sendCommand(command);
+			return sendCommand(command);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return "ERROR!"+e.getMessage();
@@ -145,23 +136,23 @@ public class RedisUtil extends Jedis{
 	/*
 	 * 在不知道或者无视key的类型时获取其值
 	 */
-	public Object getWithoutType(final String key) {
+	public static Object getWithoutType(final String key) {
 		try {
 			// 获取key的类型
-			String type = (String) this.type(key);
+			String type = (String) redis.type(key);
 			// 根据类型发送对应的指令
 			if ("none".equals(type)) {
 				return "no this key --" + key;
 			} else if ("string".equals(type)) {
-				return this.get(key);
+				return redis.get(key);
 			} else if ("list".equals(type)) {
-				return this.lrange(key, 0, Long.MAX_VALUE);
+				return redis.lrange(key, 0, Long.MAX_VALUE);
 			} else if ("hash".equals(type)) {
-				return this.hgetAll(key);
+				return redis.hgetAll(key);
 			} else if ("set".equals(type)) {
-				return this.smembers(key);
+				return redis.smembers(key);
 			} else if ("zset".equals(type)) {
-				return this.zrange(key, 0, Long.MAX_VALUE);
+				return redis.zrange(key, 0, Long.MAX_VALUE);
 			}
 		}catch (JedisException e) {
 			e.printStackTrace();
@@ -173,7 +164,7 @@ public class RedisUtil extends Jedis{
 	/*
 	 * 批量提交方法
 	 */
-	public List<Object> commit(final String text) {
+	public static List<Object> commit(final String text) {
 		// 将指令以行分离，并无视空行及注释
 		String[] commands = text.split("\n|\r");
 		List<String> commandlist = new ArrayList<>();
@@ -184,7 +175,7 @@ public class RedisUtil extends Jedis{
 		}
 		// 循环获取结果
 		List<Object> resultlist = new ArrayList<>();
-		commandlist.forEach(command -> resultlist.add(this.sendCommandUseErrmsg(command)));
+		commandlist.forEach(command -> resultlist.add(sendCommandUseErrmsg(command)));
 		return resultlist;
 	}
 	

@@ -46,7 +46,7 @@ public class KeysPanel extends JPanel implements MouseListener, KeyListener{
 	}
 	
 	public void query() {
-		Application.mainUI.dataPanel.resultPanel.show(RedisUtil.getInstance().getWithoutType(jlist.getSelectedValue()));
+		Application.mainUI.dataPanel.resultPanel.show(RedisUtil.getWithoutType(jlist.getSelectedValue()));
 		Application.mainUI.logPanel.log("获取"+jlist.getSelectedValue());	
 	}
 

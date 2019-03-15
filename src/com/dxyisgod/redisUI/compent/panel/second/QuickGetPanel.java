@@ -47,7 +47,7 @@ public class QuickGetPanel extends JPanel implements KeyListener{
 	}
 	
 	private void query() {
-		Application.mainUI.dataPanel.resultPanel.show(RedisUtil.getInstance().getWithoutType(keyField.getText()));
+		Application.mainUI.dataPanel.resultPanel.show(RedisUtil.getWithoutType(keyField.getText()));
 		Application.mainUI.logPanel.log("获取"+keyField.getText());
 	}
 	
